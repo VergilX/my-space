@@ -3,18 +3,21 @@ package main
 import (
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/justinas/alice"
 )
 
 func (app *application) routes() http.Handler {
-	router := httprouter.New()
+	router := http.NewServeMux()
 
-	router.HandlerFunc(http.MethodGet, "/v1/status", app.checkStatus)
+	router.HandleFunc("GET /v1/status", app.checkStatus)
+
+	// chain middleware
+	baseChain := alice.New(app.userAuthCheck)
 
 	// user stuff
-	router.HandlerFunc(http.MethodPost, "/v1/register", app.registerUser)
-	router.HandlerFunc(http.MethodPost, "/v1/login", app.loginUser)
-	router.HandlerFunc(http.MethodPost, "/v1/logout", app.logoutUser)
+	router.Handle("/v1/register", baseChain.ThenFunc(app.registerUser))
+	router.Handle("/v1/login", baseChain.ThenFunc(app.loginUser))
+	router.Handle("/v1/logout", baseChain.ThenFunc(app.logoutUser))
 
-	return router
+	return app.requestLog(router)
 }
