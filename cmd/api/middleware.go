@@ -42,9 +42,9 @@ func (app *application) userAuthCheck(handler http.Handler) http.Handler {
 
 		// if not successful, return to home or register
 
-		var session_token, err = r.Cookie("session_token")
+		var _, err = r.Cookie("session_token")
 		if err == http.ErrNoCookie {
-			app.logger.Info("user auth check middleware: ", "cookie", session_token.String())
+			app.cookieNotFoundError(w, r, err, "session_token")
 		}
 		handler.ServeHTTP(w, r)
 	})
