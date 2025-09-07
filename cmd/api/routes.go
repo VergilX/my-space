@@ -15,9 +15,11 @@ func (app *application) routes() http.Handler {
 	baseChain := alice.New(app.userAuthCheck)
 
 	// user stuff
-	router.Handle("/v1/register", baseChain.ThenFunc(app.registerUser))
-	router.Handle("/v1/login", baseChain.ThenFunc(app.loginUser))
-	router.Handle("/v1/logout", baseChain.ThenFunc(app.logoutUser))
+	router.HandleFunc("POST /v1/register", app.registerUser)
+	router.Handle("POST /v1/login", baseChain.ThenFunc(app.loginUser))
+	router.Handle("POST /v1/logout", baseChain.ThenFunc(app.logoutUser))
 
-	return app.requestLog(router)
+	// protected routes
+
+	return app.recoverPanic(app.requestLog(router))
 }

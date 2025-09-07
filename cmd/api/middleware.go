@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"slices"
 
@@ -17,7 +18,7 @@ func (app *application) requestLog(handler http.Handler) http.Handler {
 			protocol = r.Proto
 		)
 
-		app.logger.Info("request log:", "ip", ip, "url", url.String(), "method", method, "protocol", protocol)
+		app.logger.Info("request log:", "ip", ip, "url", url.RequestURI(), "method", method, "protocol", protocol)
 
 		handler.ServeHTTP(w, r)
 	}))
@@ -46,6 +47,20 @@ func (app *application) userAuthCheck(handler http.Handler) http.Handler {
 		if err == http.ErrNoCookie {
 			app.cookieNotFoundError(w, r, err, "session_token")
 		}
+		handler.ServeHTTP(w, r)
+	})
+}
+
+func (app *application) recoverPanic(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				w.Header().Set("Connection", "close")
+
+				app.logger.Error(fmt.Errorf("%s", err).Error(), "msg", "server panic")
+			}
+		}()
+
 		handler.ServeHTTP(w, r)
 	})
 }
