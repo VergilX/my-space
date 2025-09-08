@@ -2,32 +2,91 @@ package main
 
 import (
 	"net/http"
+	"time"
+
+	"github.com/VergilX/my-space/internal/auth"
 )
 
 func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 	// get data from form and validate
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	if username == "" || password == "" {
+		app.formValueError(w, r, "username or password is missing")
+	}
 
 	// use internals module auth to add user to db
 	// while performing required functions
-
-	// report errors as required
-
+	err := auth.Register(username, password)
+	if err != nil {
+		app.authenticationError(w, r, err, "registration error")
+	}
 }
 
 func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	// get data from POST request and validate
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	if username == "" || password == "" {
+		app.formValueError(w, r, "username or password is missing")
+	}
 
 	// login using internals
+	session_token, csrf_token, err := auth.Login(username, password)
+	if err != nil {
+		app.authenticationError(w, r, err, "login error")
+	}
 
-	// report errors
+	// set session and csrf cookie for response
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    session_token,
+		Expires:  time.Now().Add(24 * time.Hour),
+		HttpOnly: true,
+	})
 
+	// set session and csrf cookie for response
+	http.SetCookie(w, &http.Cookie{
+		Name:     "csrf_token",
+		Value:    csrf_token,
+		Expires:  time.Now().Add(24 * time.Hour),
+		HttpOnly: true,
+	})
+
+	auth.ShowTempDBValues()
 }
 
 func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
 	// get data from POST request and validate
+	username := r.FormValue(("username"))
+
+	if username == "" {
+		app.formValueError(w, r, "username missing")
+	}
 
 	// logout using internals
+	err := auth.Logout(username)
+	if err != nil {
+		app.authenticationError(w, r, err, "logout error")
+	}
 
-	// report errors
+	// clear cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		HttpOnly: true,
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "csrf_token",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		HttpOnly: false,
+	})
+
+	auth.ShowTempDBValues()
 
 }

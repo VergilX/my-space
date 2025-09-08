@@ -36,7 +36,7 @@ This is a project which allows me to dump files in my local network. Being local
 
 ## Todo
 
-- [ ] Make login and logout basic functioning
+- [x] Make login and logout basic functioning
 - [ ] Modify userAuth middleware
 - [ ] Modify errors to make proper handlers
 - [ ] Redirection after errors

@@ -1,30 +1,78 @@
 package auth
 
-// import db
+import (
+	"errors"
+	"fmt"
+)
 
-func Register() error {
+// temporary database
+var users = map[string]string{}
+var session = make(map[string]string)
+var csrf = make(map[string]string)
+
+// used for generating a token
+var TOKEN_SIZE int = 128
+
+func ShowTempDBValues() {
+	fmt.Println(users, session, csrf)
+}
+
+func Register(username, password string) error {
+	// check if username already in db
+	if _, exists := users[username]; exists {
+		return errors.New("username already exists")
+	}
+
 	// hash password
+	hash, err := hashPassword(password)
+	if err != nil {
+		return err
+	}
 
 	// store in db
+	users[username] = hash
 
 	// return error
+	return nil
 }
 
 func Login(username, password string) (string, string, error) {
-	// hash password
-
-	// get username, password from db
+	// check if username in db
+	hash, exists := users[username]
+	if !exists {
+		return "", "", errors.New("username does not exist")
+	}
 
 	// match username and password
+	matched := validatePasswordWithHash(password, hash)
+	if !matched {
+		return "", "", errors.New("invalid password")
+	}
 
 	// create the session cookie
+	session_token, err := generateToken(TOKEN_SIZE)
+	if err != nil {
+		return "", "", err
+	}
+	session[username] = session_token
 
 	// create the csrf token, to be used by client for next request
+	csrf_token, err := generateToken(TOKEN_SIZE)
+	if err != nil {
+		return "", "", err
+	}
 
+	// store in db
+	csrf[username] = csrf_token
+
+	return session_token, csrf_token, nil
 }
 
 func Logout(username string) error {
-	// get username from db
+	// remove entry from db
+	delete(users, username)
+	delete(session, username)
+	delete(csrf, username)
 
-	// remove entry
+	return nil
 }
