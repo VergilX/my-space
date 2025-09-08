@@ -36,7 +36,9 @@ This is a project which allows me to dump files in my local network. Being local
 
 ## Todo
 
-- [ ] Make login and logout functions
+- [ ] Make login and logout basic functioning
+- [ ] Modify userAuth middleware
 - [ ] Modify errors to make proper handlers
+- [ ] Redirection after errors
 - [ ] Create proper JSON request and response structures and make proper JSON returns
-- [ ] Create validator package if required
+- [ ] (if required) Create validator package and modify funcs to use it
