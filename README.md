@@ -33,3 +33,10 @@ This is a project which allows me to dump files in my local network. Being local
 1. FrontEnd: Vue js
 2. BackEnd: Golang
 
+
+## Todo
+
+- [ ] Make login and logout functions
+- [ ] Modify errors to make proper handlers
+- [ ] Create proper JSON request and response structures and make proper JSON returns
+- [ ] Create validator package if required
