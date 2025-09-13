@@ -54,8 +54,6 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(24 * time.Hour),
 		HttpOnly: true,
 	})
-
-	auth.ShowTempDBValues()
 }
 
 func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {

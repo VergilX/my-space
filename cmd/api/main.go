@@ -3,10 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/VergilX/my-space/internal/db"
+	database "github.com/VergilX/my-space/internal/db"
 )
 
 const version = "1.0.0"
@@ -20,6 +24,7 @@ type config struct {
 type application struct {
 	config config
 	logger *slog.Logger
+	db     *db.DB
 }
 
 func main() {
@@ -32,9 +37,18 @@ func main() {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
+	// init db
+	dsn := "file:locked.sqlite?cache=shared"
+	db, err := database.New(dsn)
+	if err != nil {
+		log.Fatal("database connection error")
+		os.Exit(1)
+	}
+
 	app := application{
 		config: cfg,
 		logger: logger,
+		db:     db,
 	}
 
 	srv := http.Server{
@@ -48,7 +62,7 @@ func main() {
 
 	logger.Info("starting server", "addr", srv.Addr, "env", cfg.env)
 
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	logger.Error(err.Error())
 	os.Exit(1)
 }

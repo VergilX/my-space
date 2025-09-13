@@ -2,7 +2,6 @@ package auth
 
 import (
 	"errors"
-	"fmt"
 )
 
 // temporary database
@@ -12,10 +11,6 @@ var csrf = make(map[string]string)
 
 // used for generating a token
 var TOKEN_SIZE int = 128
-
-func ShowTempDBValues() {
-	fmt.Println(users, session, csrf)
-}
 
 func Register(username, password string) error {
 	// check if username already in db
