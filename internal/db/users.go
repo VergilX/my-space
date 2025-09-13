@@ -6,7 +6,15 @@ type User struct {
 	password string // hashed value
 }
 
-func (db DB) userSchemaExists(tableName string) (bool, error) {
+func (db DB) userSchemaExists() (bool, error) {
+
+}
+
+func (db DB) createUserTable() error {
+
+}
+
+func (db DB) dropUserTable() error {
 
 }
 

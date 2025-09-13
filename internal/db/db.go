@@ -34,3 +34,19 @@ func (db DB) Close() error {
 
 	return nil
 }
+
+func (db DB) createTable(tableName string) error {
+
+}
+
+func (db DB) dropTable(tableName string) error {
+
+}
+
+func (db DB) selectAllFromTable(tableName string) (*sql.Rows, error) {
+
+}
+
+func (db DB) selectRowFromTable(tableName string, key string, value string) (*sql.Row, error) {
+	// idk if this function will work
+}
