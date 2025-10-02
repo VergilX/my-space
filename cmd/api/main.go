@@ -9,7 +9,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/VergilX/my-space/internal/db"
 	database "github.com/VergilX/my-space/internal/db"
 )
 
@@ -24,7 +23,7 @@ type config struct {
 type application struct {
 	config config
 	logger *slog.Logger
-	db     *db.DB
+	db     *database.DB
 }
 
 func main() {
@@ -37,19 +36,22 @@ func main() {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	// init db
-	dsn := "file:locked.sqlite?cache=shared"
+	dsn := "./foo.db"
 	db, err := database.New(dsn)
 	if err != nil {
+		log.Fatal("error: ", err)
 		log.Fatal("database connection error")
 		os.Exit(1)
 	}
+	defer db.CloseConn()
 
 	app := application{
 		config: cfg,
 		logger: logger,
 		db:     db,
 	}
+
+	defer db.CloseConn()
 
 	srv := http.Server{
 		Addr:         fmt.Sprintf(":%d", app.config.port),

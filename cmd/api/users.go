@@ -16,12 +16,15 @@ func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 		app.formValueError(w, r, "username or password is missing")
 	}
 
-	// use internals module auth to add user to db
-	// while performing required functions
-	err := auth.Register(username, password)
+	// if username already exists give error
+	exists, err := app.db.IfUserExists(username)
 	if err != nil {
-		app.authenticationError(w, r, err, "registration error")
+		app.logger.Error("Error accessing user database")
 	}
+	if exists {
+		app.logger.Error("User already exists")
+	}
+
 }
 
 func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +87,4 @@ func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(-time.Hour),
 		HttpOnly: false,
 	})
-
-	auth.ShowTempDBValues()
-
 }

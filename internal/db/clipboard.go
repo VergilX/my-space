@@ -6,5 +6,6 @@ type Clip struct {
 }
 
 func (db DB) getClip(userID int) (Clip, error) {
+	// dummy value
 	return Clip{userID: 1, content: ""}, nil
 }

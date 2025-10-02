@@ -2,6 +2,8 @@ package auth
 
 import (
 	"errors"
+
+	_ "github.com/VergilX/my-space/internal/db"
 )
 
 // temporary database
