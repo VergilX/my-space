@@ -10,6 +10,7 @@ import (
 	"time"
 
 	database "github.com/VergilX/my-space/internal/db"
+	"github.com/VergilX/my-space/internal/dblayer"
 )
 
 const version = "1.0.0"
@@ -17,13 +18,14 @@ const version = "1.0.0"
 type config struct {
 	port int
 	env  string
+	db   string
 }
 
 // create application struct
 type application struct {
-	config config
-	logger *slog.Logger
-	db     *database.DB
+	config  config
+	logger  *slog.Logger
+	querier *dblayer.Queries
 }
 
 func main() {
@@ -32,26 +34,23 @@ func main() {
 	// Adding flags
 	flag.IntVar(&cfg.port, "port", 4000, "API Server Port")
 	flag.StringVar(&cfg.env, "environment", "development", "Environment(development|staging|production)")
+	flag.StringVar(&cfg.db, "database name", "dump.db", "Database name")
 	flag.Parse()
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	dsn := "./foo.db"
-	db, err := database.New(dsn)
+	db, err := database.New(cfg.db)
 	if err != nil {
-		log.Fatal("error: ", err)
-		log.Fatal("database connection error")
+		log.Fatalf("database connection error. Error: %v", err)
 		os.Exit(1)
 	}
 	defer db.CloseConn()
 
 	app := application{
-		config: cfg,
-		logger: logger,
-		db:     db,
+		config:  cfg,
+		logger:  logger,
+		querier: db.Queries,
 	}
-
-	defer db.CloseConn()
 
 	srv := http.Server{
 		Addr:         fmt.Sprintf(":%d", app.config.port),

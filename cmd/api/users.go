@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/VergilX/my-space/internal/auth"
+	"github.com/VergilX/my-space/internal/dblayer"
 )
 
 func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
@@ -16,15 +17,15 @@ func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 		app.formValueError(w, r, "username or password is missing")
 	}
 
-	// if username already exists give error
-	exists, err := app.db.IfUserExists(username)
-	if err != nil {
-		app.logger.Error("Error accessing user database")
-	}
-	if exists {
-		app.logger.Error("User already exists")
+	arg := dblayer.CreateUserParams{
+		Username: username,
+		Password: password,
 	}
 
+	err := app.querier.CreateUser(r.Context(), arg)
+	if err != nil {
+		app.logger.Error("Could not create user. err: ", err)
+	}
 }
 
 func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
