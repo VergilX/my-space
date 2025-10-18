@@ -40,7 +40,7 @@ This is a project which allows me to dump files in my local network. Being local
 - [x] Create database structure and design
 - [x] Implement basic database design
 - [ ] Create proper JSON request and response structures and make proper JSON returns
-    - [ ] Define request and response internals
+    - [x] Define request and response internals
     - [ ] Create function for error responses
 - [ ] (if required) Create validator package and modify funcs to use it
 - [ ] Integrate database with backend
