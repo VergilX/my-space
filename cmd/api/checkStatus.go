@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/VergilX/my-space/internal/response"
 )
 
 func (app *application) checkStatus(w http.ResponseWriter, r *http.Request) {
@@ -13,8 +15,8 @@ func (app *application) checkStatus(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	err := app.writeToJSON(w, http.StatusOK, data, nil)
+	err := response.JSON(w, http.StatusOK, data)
 	if err != nil {
-		app.jsonParseError(w, r, err)
+		app.badRequestResponse(w, r, err)
 	}
 }

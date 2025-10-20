@@ -36,14 +36,28 @@ This is a project which allows me to dump files in my local network. Being local
 
 ## Todo
 
+#### User authentication
 - [x] Make login and logout basic functioning
 - [x] Create database structure and design
 - [x] Implement basic database design
 - [ ] Create proper JSON request and response structures and make proper JSON returns
     - [x] Define request and response internals
-    - [ ] Create function for error responses
-- [ ] (if required) Create validator package and modify funcs to use it
+    - [x] Create proper error functions
+- [x] Create validator and error function failedValidation
+- [x] Change all instance of app.badRequestError with appropriate stuff
+- [x] trace should only be shown if a flag is enabled
 - [ ] Integrate database with backend
-- [ ] Modify errors to make proper handlers
 - [ ] Modify userAuth middleware
+- [ ] Session management logic implementation
+- [ ] Add Full Name field to user
+- [ ] Context integration
 - [ ] Implement API versioning
+
+
+#### Clipboard
+
+#### Paste
+
+#### FTP
+
+#### Streaming

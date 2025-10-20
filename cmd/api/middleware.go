@@ -27,10 +27,10 @@ func (app *application) userAuthCheck(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// first value to be used after DB implementation
 		_, err := r.Cookie("session_token")
-		if err != nil {
 
+		if err != nil {
 			if err == http.ErrNoCookie {
-				app.cookieNotFoundError(w, r, err, "session_token")
+				app.badRequestResponse(w, r, err) // replace with auth error
 			}
 		}
 
