@@ -17,11 +17,16 @@ func (app *application) logError(r *http.Request, err error) {
 		message = err.Error()
 		method  = r.Method
 		url     = r.URL.String()
-		trace   = string(debug.Stack()) // idk if I want this
 	)
 
 	requestAttrs := slog.Group("request", "method", method, "url", url)
-	app.logger.Error(message, requestAttrs, "trace", trace)
+
+	if app.config.traceEnabled {
+		trace := string(debug.Stack())
+		app.logger.Error(message, requestAttrs, "trace", trace)
+	} else {
+		app.logger.Error(message, requestAttrs)
+	}
 }
 
 func (app *application) errorResponse(w http.ResponseWriter, r *http.Request, status int, message string, headers http.Header) {

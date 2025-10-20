@@ -16,12 +16,13 @@ import (
 const version = "1.0.0"
 
 type config struct {
-	port int
-	env  string
-	db   string
+	port         int
+	env          string
+	db           string
+	traceEnabled bool
 }
 
-// create application struct
+// dependency injection components
 type application struct {
 	config  config
 	logger  *slog.Logger
@@ -35,6 +36,7 @@ func main() {
 	flag.IntVar(&cfg.port, "port", 4000, "API Server Port")
 	flag.StringVar(&cfg.env, "environment", "development", "Environment(development|staging|production)")
 	flag.StringVar(&cfg.db, "database name", "dump.db", "Database name")
+	flag.BoolVar(&cfg.traceEnabled, "trace", false, "stack trace enable for errors")
 	flag.Parse()
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
