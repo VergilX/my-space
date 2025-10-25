@@ -7,14 +7,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func hashPassword(password string) (string, error) {
+func HashPassword(password string) (string, error) {
 	// hash password and return
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	return string(hash), err
 }
 
-func validatePasswordWithHash(password string, hash string) bool {
+func ValidatePasswordWithHash(password string, hash string) bool {
 	byte_password := []byte(password)
 
 	err := bcrypt.CompareHashAndPassword([]byte(hash), byte_password)
@@ -22,7 +22,7 @@ func validatePasswordWithHash(password string, hash string) bool {
 	return err == nil
 }
 
-func generateToken(length int) (string, error) {
+func GenerateToken(length int) (string, error) {
 	bytes := make([]byte, length)
 
 	_, err := rand.Read(bytes)

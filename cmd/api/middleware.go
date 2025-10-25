@@ -1,11 +1,21 @@
 package main
 
 import (
+	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 
+	"github.com/VergilX/my-space/internal/request"
+	"github.com/VergilX/my-space/internal/validator"
 	"github.com/tomasen/realip"
 )
+
+// idk why you need this but ok
+type StringContextKey string
+
+var userIDKey StringContextKey = "user-id"
 
 func (app *application) requestLog(handler http.Handler) http.Handler {
 	return http.HandlerFunc((func(w http.ResponseWriter, r *http.Request) {
@@ -23,19 +33,63 @@ func (app *application) requestLog(handler http.Handler) http.Handler {
 	}))
 }
 
-func (app *application) userAuthCheck(handler http.Handler) http.Handler {
+func (app *application) protected(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// first value to be used after DB implementation
-		_, err := r.Cookie("session_token")
-
-		if err != nil {
-			if err == http.ErrNoCookie {
-				app.badRequestResponse(w, r, err) // replace with auth error
-			}
+		var input struct {
+			CSRFToken string `json:"csrf_token"`
 		}
 
-		// check database for session_token value and authenticate
-		// to be implmented after db implementation
+		err := request.DecodeJSONStrict(w, r, &input)
+		if err != nil {
+			app.badRequestResponse(w, r, err)
+			return
+		}
+
+		v := validator.New()
+
+		v.Check(input.CSRFToken != "", "csrf_token", "should not be empty")
+
+		if !v.Valid() {
+			app.failedValidationResponse(w, r, v)
+			return
+		}
+
+		// get session token cookie
+		cookie, err := r.Cookie("session_token")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				app.failedAuthentication(w, r, err)
+			} else {
+				app.serverError(w, r, err)
+			}
+
+			return
+		}
+
+		id, err := app.querier.GetUserIDFromSessionToken(app.ctx, cookie.Value)
+		if err == sql.ErrNoRows {
+			app.failedAuthentication(w, r, err)
+			return
+		} else if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+
+		// verify CSRF
+		exists, err := app.querier.VerifyCSRFToken(app.ctx, input.CSRFToken)
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+
+		if exists == 0 {
+			app.failedAuthentication(w, r, errors.New("invalid csrf token"))
+			return
+		}
+
+		// session and CSRF are verified, store id in context
+		ctx := context.WithValue(r.Context(), userIDKey, id)
+		r = r.WithContext(ctx)
 
 		handler.ServeHTTP(w, r)
 	})

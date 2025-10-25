@@ -21,7 +21,7 @@ func Register(username, password string) error {
 	}
 
 	// hash password
-	hash, err := hashPassword(password)
+	hash, err := HashPassword(password)
 	if err != nil {
 		return err
 	}
@@ -41,20 +41,20 @@ func Login(username, password string) (string, string, error) {
 	}
 
 	// match username and password
-	matched := validatePasswordWithHash(password, hash)
+	matched := ValidatePasswordWithHash(password, hash)
 	if !matched {
 		return "", "", errors.New("invalid password")
 	}
 
 	// create the session cookie
-	session_token, err := generateToken(TOKEN_SIZE)
+	session_token, err := GenerateToken(TOKEN_SIZE)
 	if err != nil {
 		return "", "", err
 	}
 	session[username] = session_token
 
 	// create the csrf token, to be used by client for next request
-	csrf_token, err := generateToken(TOKEN_SIZE)
+	csrf_token, err := GenerateToken(TOKEN_SIZE)
 	if err != nil {
 		return "", "", err
 	}

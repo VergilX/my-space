@@ -10,11 +10,11 @@ import (
 )
 
 func DecodeJSONStrict(w http.ResponseWriter, r *http.Request, dst any) error {
-	return decodeJSON(w, r, dst, false)
+	return decodeJSON(w, r, dst, true)
 }
 
 func DecodeJSON(w http.ResponseWriter, r *http.Request, dst any) error {
-	return decodeJSON(w, r, dst, true)
+	return decodeJSON(w, r, dst, false)
 }
 
 func decodeJSON(w http.ResponseWriter, r *http.Request, dst any, disallowUnknownFields bool) error {

@@ -5,7 +5,7 @@ INSERT INTO clips(userid, text) VALUES (
 
 -- name: GetClipContent :one
 SELECT text FROM clips
-    WHERE id = ?;
+    WHERE userid = ?;
 
 -- name: UpdateClip :exec
 UPDATE clips

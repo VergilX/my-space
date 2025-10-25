@@ -46,13 +46,16 @@ This is a project which allows me to dump files in my local network. Being local
 - [x] Create validator and error function failedValidation
 - [x] Change all instance of app.badRequestError with appropriate stuff
 - [x] trace should only be shown if a flag is enabled
-- [ ] Integrate database with backend
-- [ ] Modify userAuth middleware
-- [ ] Session management logic implementation
-- [ ] Add Full Name field to user
-- [ ] Context integration
-- [ ] Implement API versioning
+- [x] integrate context if required
+- [x] change db structure to keep UserId as primary key
+- [x] in protection middleware, keep UserId in context
+- [x] Integrate database with backend
+- [x] Modify userAuth middleware
+- [ ] Add indexing
+- [ ] Clean invalid sessions at the end of the day
 
+doubts:
+    - How will you check if the error from DB is duplciated username or something else?
 
 #### Clipboard
 

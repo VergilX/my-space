@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -27,6 +28,7 @@ type application struct {
 	config  config
 	logger  *slog.Logger
 	querier *dblayer.Queries
+	ctx     context.Context
 }
 
 func main() {
@@ -52,6 +54,7 @@ func main() {
 		config:  cfg,
 		logger:  logger,
 		querier: db.Queries,
+		ctx:     context.Background(),
 	}
 
 	srv := http.Server{

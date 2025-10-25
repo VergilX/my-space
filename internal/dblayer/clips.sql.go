@@ -38,11 +38,11 @@ func (q *Queries) DeleteClip(ctx context.Context, userid int64) error {
 
 const getClipContent = `-- name: GetClipContent :one
 SELECT text FROM clips
-    WHERE id = ?
+    WHERE userid = ?
 `
 
-func (q *Queries) GetClipContent(ctx context.Context, id int64) (sql.NullString, error) {
-	row := q.db.QueryRowContext(ctx, getClipContent, id)
+func (q *Queries) GetClipContent(ctx context.Context, userid int64) (sql.NullString, error) {
+	row := q.db.QueryRowContext(ctx, getClipContent, userid)
 	var text sql.NullString
 	err := row.Scan(&text)
 	return text, err

@@ -4,7 +4,7 @@ INSERT INTO pastes(userid, text) VALUES (
 );
 
 -- name: GetAllPastes :many
-SELECT text FROM pastes
+SELECT * FROM pastes
     WHERE userid = ?;
 
 -- name: UpdatePaste :exec

@@ -9,10 +9,11 @@ import (
 	"context"
 )
 
-const createUser = `-- name: CreateUser :exec
+const createUser = `-- name: CreateUser :one
 INSERT INTO users(username, password) VALUES (
     ?, ?
 )
+RETURNING id
 `
 
 type CreateUserParams struct {
@@ -20,9 +21,11 @@ type CreateUserParams struct {
 	Password string
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
-	_, err := q.db.ExecContext(ctx, createUser, arg.Username, arg.Password)
-	return err
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createUser, arg.Username, arg.Password)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const deleteUser = `-- name: DeleteUser :exec
@@ -35,13 +38,28 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 	return err
 }
 
-const getUser = `-- name: GetUser :one
-SELECT id, username, password FROM users
-    WHERE id = ?
+const doesUserExist = `-- name: DoesUserExist :one
+SELECT EXISTS (
+    SELECT id
+    FROM users
+WHERE username = ?
+)
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUser, id)
+func (q *Queries) DoesUserExist(ctx context.Context, username string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, doesUserExist, username)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const getUser = `-- name: GetUser :one
+SELECT id, username, password FROM users
+    WHERE username = ?
+`
+
+func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUser, username)
 	var i User
 	err := row.Scan(&i.ID, &i.Username, &i.Password)
 	return i, err

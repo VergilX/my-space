@@ -47,23 +47,28 @@ func (q *Queries) DeletePaste(ctx context.Context, id int64) error {
 }
 
 const getAllPastes = `-- name: GetAllPastes :many
-SELECT text FROM pastes
+SELECT id, userid, text, expires FROM pastes
     WHERE userid = ?
 `
 
-func (q *Queries) GetAllPastes(ctx context.Context, userid int64) ([]sql.NullString, error) {
+func (q *Queries) GetAllPastes(ctx context.Context, userid int64) ([]Paste, error) {
 	rows, err := q.db.QueryContext(ctx, getAllPastes, userid)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []sql.NullString
+	var items []Paste
 	for rows.Next() {
-		var text sql.NullString
-		if err := rows.Scan(&text); err != nil {
+		var i Paste
+		if err := rows.Scan(
+			&i.ID,
+			&i.Userid,
+			&i.Text,
+			&i.Expires,
+		); err != nil {
 			return nil, err
 		}
-		items = append(items, text)
+		items = append(items, i)
 	}
 	if err := rows.Close(); err != nil {
 		return nil, err

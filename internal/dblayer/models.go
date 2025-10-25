@@ -9,15 +9,31 @@ import (
 )
 
 type Clip struct {
+	ID      int64
+	Userid  int64
+	Text    sql.NullString
+	Expires sql.NullString
+}
+
+type Csrf struct {
 	ID     int64
 	Userid int64
-	Text   sql.NullString
+	Token  string
+	Expiry string
 }
 
 type Paste struct {
+	ID      int64
+	Userid  int64
+	Text    sql.NullString
+	Expires sql.NullString
+}
+
+type Session struct {
 	ID     int64
 	Userid int64
-	Text   sql.NullString
+	Token  string
+	Expiry string
 }
 
 type User struct {

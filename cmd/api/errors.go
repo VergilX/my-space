@@ -70,3 +70,10 @@ func (app *application) failedValidationResponse(w http.ResponseWriter, r *http.
 		app.serverError(w, r, err)
 	}
 }
+
+func (app *application) failedAuthentication(w http.ResponseWriter, r *http.Request, err error) {
+	app.logError(r, err)
+
+	message := "authentication failed"
+	app.errorResponse(w, r, http.StatusUnauthorized, message, nil)
+}

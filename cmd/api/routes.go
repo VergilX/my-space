@@ -12,11 +12,12 @@ func (app *application) routes() http.Handler {
 	router.HandleFunc("GET /v1/status", app.checkStatus)
 
 	// chain middleware
-	baseChain := alice.New(app.userAuthCheck)
+	baseChain := alice.New(app.protected)
 
 	// user stuff
 	router.HandleFunc("POST /v1/register", app.registerUser)
 	router.HandleFunc("POST /v1/login", app.loginUser)
+	// router.HandleFunc("POST /v1/logout", app.logoutUser)
 
 	// protected routes
 	router.Handle("POST /v1/logout", baseChain.ThenFunc(app.logoutUser))
