@@ -20,6 +20,7 @@ This is a project which allows me to dump files in my local network. Being local
 | GET             | /v1/login          | loginUser     | Logs in using credentials                 |
 | GET             | /v1/logout         | logoutUser    | Logs out using credentials                |
 | GET             | /v1/clipboard      | getClipboard  | Gets content from clipboard               |
+| POST            | /v1/setclip        | setClipText   | Sets content of clipboard                 |
 | GET             | /v1/view_all_paste | getAllPaste   | Gets all pastes of user                   |
 | GET             | /v1/getpaste/:id   | getPaste      | Gets specified paste                      |
 | POST            | /v1/newpaste       | writeNewPaste | Writes new paste                          |
@@ -58,6 +59,8 @@ doubts:
     - How will you check if the error from DB is duplciated username or something else?
 
 #### Clipboard
+- [ ] Implement getClipboard() handler to return clip context as JSON
+- [ ] Implement setClipText() handler to set clipboard context
 
 #### Paste
 
