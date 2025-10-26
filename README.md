@@ -60,8 +60,9 @@ doubts:
     - How will you check if the error from DB is duplciated username or something else?
 
 #### Clipboard
-- [ ] Implement getClipboard() handler to return clip context as JSON
-- [ ] Implement setClipText() handler to set clipboard context
+- [x] Implement getClipboard() handler to return clip context as JSON
+- [x] Implement setClipText() handler to set clipboard context
+- [ ] Timer to clean clips at the end of the day
 
 #### Paste
 

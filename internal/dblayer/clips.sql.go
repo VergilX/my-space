@@ -7,7 +7,6 @@ package dblayer
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createClip = `-- name: CreateClip :exec
@@ -18,7 +17,7 @@ INSERT INTO clips(userid, text) VALUES (
 
 type CreateClipParams struct {
 	Userid int64
-	Text   sql.NullString
+	Text   string
 }
 
 func (q *Queries) CreateClip(ctx context.Context, arg CreateClipParams) error {
@@ -41,9 +40,9 @@ SELECT text FROM clips
     WHERE userid = ?
 `
 
-func (q *Queries) GetClipContent(ctx context.Context, userid int64) (sql.NullString, error) {
+func (q *Queries) GetClipContent(ctx context.Context, userid int64) (string, error) {
 	row := q.db.QueryRowContext(ctx, getClipContent, userid)
-	var text sql.NullString
+	var text string
 	err := row.Scan(&text)
 	return text, err
 }
@@ -55,7 +54,7 @@ WHERE userid = ?
 `
 
 type UpdateClipParams struct {
-	Text   sql.NullString
+	Text   string
 	Userid int64
 }
 

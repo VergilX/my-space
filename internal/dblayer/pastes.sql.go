@@ -7,7 +7,6 @@ package dblayer
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createPaste = `-- name: CreatePaste :exec
@@ -18,7 +17,7 @@ INSERT INTO pastes(userid, text) VALUES (
 
 type CreatePasteParams struct {
 	Userid int64
-	Text   sql.NullString
+	Text   string
 }
 
 func (q *Queries) CreatePaste(ctx context.Context, arg CreatePasteParams) error {
@@ -86,7 +85,7 @@ WHERE id = ?
 `
 
 type UpdatePasteParams struct {
-	Text sql.NullString
+	Text string
 	ID   int64
 }
 

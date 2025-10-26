@@ -4,15 +4,10 @@
 
 package dblayer
 
-import (
-	"database/sql"
-)
-
 type Clip struct {
-	ID      int64
-	Userid  int64
-	Text    sql.NullString
-	Expires sql.NullString
+	ID     int64
+	Userid int64
+	Text   string
 }
 
 type Csrf struct {
@@ -25,8 +20,8 @@ type Csrf struct {
 type Paste struct {
 	ID      int64
 	Userid  int64
-	Text    sql.NullString
-	Expires sql.NullString
+	Text    string
+	Expires string
 }
 
 type Session struct {

@@ -23,15 +23,14 @@ CREATE TABLE IF NOT EXISTS csrf (
 CREATE TABLE IF NOT EXISTS clips (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userid INTEGER UNIQUE NOT NULL,
-    text TEXT,
-    expires TEXT,
+    text TEXT NOT NULL DEFAULT '',
     FOREIGN KEY (userid) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS pastes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userid INTEGER UNIQUE NOT NULL,
-    text TEXT,
-    expires TEXT,
+    text TEXT NOT NULL DEFAULT '',
+    expires TEXT NOT NULL,
     FOREIGN KEY (userid) REFERENCES users(id)
 )

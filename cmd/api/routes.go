@@ -23,6 +23,7 @@ func (app *application) routes() http.Handler {
 	router.Handle("POST /v1/logout", baseChain.ThenFunc(app.logoutUser))
 
 	router.Handle("GET /v1/clipboard", baseChain.ThenFunc(app.getClipContent))
+	router.Handle("POST /v1/setclip", baseChain.ThenFunc(app.setClipText))
 
 	return app.recoverPanic(app.requestLog(router))
 }
