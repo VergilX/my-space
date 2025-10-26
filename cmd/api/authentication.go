@@ -48,13 +48,12 @@ func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 			// generate hashpassword
 			input.Password, err = auth.HashPassword(input.Password)
 			if err != nil {
-				app.failedAuthentication(w, r, err)
-				return
+				app.failedBasicAuth(w, r, err)
 			}
 
 			userId, err := app.querier.CreateUser(app.ctx, input)
 			if err != nil {
-				app.logError(r, err)
+				app.serverError(w, r, err)
 				response.JSON(w, http.StatusConflict, envelope{"error": "Could not create user"})
 			} else {
 				// create entries in session and csrf tables
@@ -64,6 +63,12 @@ func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 				app.querier.CreateCSRFToken(app.ctx, dblayer.CreateCSRFTokenParams{
 					Userid: userId,
 				})
+
+				// create clipboard entry in db
+				app.querier.CreateClip(app.ctx, dblayer.CreateClipParams{
+					Userid: userId,
+				})
+
 				response.JSON(w, http.StatusOK, envelope{"message": "User registered successfully!"})
 			}
 		} else {
@@ -104,7 +109,7 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if exists == 0 {
-			app.failedAuthentication(w, r, errors.New("unregistered user"))
+			app.failedBasicAuth(w, r, errors.New("unregistered user"))
 		} else {
 			// get password from db and validate
 			user, err := app.querier.GetUser(app.ctx, input.Username)
@@ -113,7 +118,7 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if !auth.ValidatePasswordWithHash(input.Password, user.Password) {
-				app.failedAuthentication(w, r, errors.New("invalid password"))
+				app.failedBasicAuth(w, r, errors.New("invalid password"))
 				return
 			}
 
@@ -125,6 +130,7 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 			csrf_token, err := auth.GenerateToken(TOKEN_SIZE)
 			if err != nil {
 				app.serverError(w, r, err)
+				return
 			}
 
 			expiry := time.Now().Add(24 * time.Hour)

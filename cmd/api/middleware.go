@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/VergilX/my-space/internal/request"
-	"github.com/VergilX/my-space/internal/validator"
 	"github.com/tomasen/realip"
 )
 
@@ -35,22 +33,10 @@ func (app *application) requestLog(handler http.Handler) http.Handler {
 
 func (app *application) protected(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			CSRFToken string `json:"csrf_token"`
-		}
-
-		err := request.DecodeJSONStrict(w, r, &input)
-		if err != nil {
-			app.badRequestResponse(w, r, err)
-			return
-		}
-
-		v := validator.New()
-
-		v.Check(input.CSRFToken != "", "csrf_token", "should not be empty")
-
-		if !v.Valid() {
-			app.failedValidationResponse(w, r, v)
+		// get csrf_token from header
+		csrfToken := r.Header.Get("X-CSRF-Token")
+		if csrfToken == "" {
+			app.failedAuthentication(w, r, errors.New("CSRF token missing"))
 			return
 		}
 
@@ -76,7 +62,7 @@ func (app *application) protected(handler http.Handler) http.Handler {
 		}
 
 		// verify CSRF
-		exists, err := app.querier.VerifyCSRFToken(app.ctx, input.CSRFToken)
+		exists, err := app.querier.VerifyCSRFToken(app.ctx, csrfToken)
 		if err != nil {
 			app.serverError(w, r, err)
 			return

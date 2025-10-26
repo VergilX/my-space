@@ -73,7 +73,18 @@ func (app *application) failedValidationResponse(w http.ResponseWriter, r *http.
 
 func (app *application) failedAuthentication(w http.ResponseWriter, r *http.Request, err error) {
 	app.logError(r, err)
+	headers := make(http.Header)
+	headers.Set("WWW-Authenticate", "session-token")
 
 	message := "authentication failed"
-	app.errorResponse(w, r, http.StatusUnauthorized, message, nil)
+	app.errorResponse(w, r, http.StatusUnauthorized, message, headers)
+}
+
+func (app *application) failedBasicAuth(w http.ResponseWriter, r *http.Request, err error) {
+	headers := make(http.Header)
+	headers.Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
+
+	app.logError(r, err)
+	message := "You must be authenticated to access this resource"
+	app.errorResponse(w, r, http.StatusUnauthorized, message, headers)
 }
