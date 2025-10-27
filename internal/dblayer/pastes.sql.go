@@ -10,44 +10,51 @@ import (
 )
 
 const createPaste = `-- name: CreatePaste :exec
-INSERT INTO pastes(userid, text) VALUES (
-    ?, ?
+INSERT INTO pastes(userid, text, expires) VALUES (
+    ?, ?, ?
 )
 `
 
 type CreatePasteParams struct {
-	Userid int64
-	Text   string
+	Userid  int64
+	Text    string
+	Expires string
 }
 
 func (q *Queries) CreatePaste(ctx context.Context, arg CreatePasteParams) error {
-	_, err := q.db.ExecContext(ctx, createPaste, arg.Userid, arg.Text)
+	_, err := q.db.ExecContext(ctx, createPaste, arg.Userid, arg.Text, arg.Expires)
 	return err
 }
 
-const deleteAllClipsFromUser = `-- name: DeleteAllClipsFromUser :exec
+const deleteAllPastesFromUser = `-- name: DeleteAllPastesFromUser :exec
 DELETE FROM pastes
-    WHERE userid = ?
+    WHERE userid = ? AND expires > CURRENT_TIMESTAMP
 `
 
-func (q *Queries) DeleteAllClipsFromUser(ctx context.Context, userid int64) error {
-	_, err := q.db.ExecContext(ctx, deleteAllClipsFromUser, userid)
+func (q *Queries) DeleteAllPastesFromUser(ctx context.Context, userid int64) error {
+	_, err := q.db.ExecContext(ctx, deleteAllPastesFromUser, userid)
 	return err
 }
 
-const deletePaste = `-- name: DeletePaste :exec
+const deletePaste = `-- name: DeletePaste :one
 DELETE FROM pastes
     WHERE id = ?
+    AND expires > CURRENT_TIMESTAMP
+RETURNING id
 `
 
-func (q *Queries) DeletePaste(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deletePaste, id)
-	return err
+func (q *Queries) DeletePaste(ctx context.Context, id int64) (int64, error) {
+	row := q.db.QueryRowContext(ctx, deletePaste, id)
+	err := row.Scan(&id)
+	return id, err
 }
 
 const getAllPastes = `-- name: GetAllPastes :many
 SELECT id, userid, text, expires FROM pastes
-    WHERE userid = ?
+    WHERE
+        userid = ?
+        AND
+        expires > CURRENT_TIMESTAMP
 `
 
 func (q *Queries) GetAllPastes(ctx context.Context, userid int64) ([]Paste, error) {
@@ -78,10 +85,13 @@ func (q *Queries) GetAllPastes(ctx context.Context, userid int64) ([]Paste, erro
 	return items, nil
 }
 
-const updatePaste = `-- name: UpdatePaste :exec
+const updatePaste = `-- name: UpdatePaste :one
 UPDATE pastes
     SET text = ?
 WHERE id = ?
+AND
+expires > CURRENT_TIMESTAMP
+RETURNING id
 `
 
 type UpdatePasteParams struct {
@@ -89,7 +99,9 @@ type UpdatePasteParams struct {
 	ID   int64
 }
 
-func (q *Queries) UpdatePaste(ctx context.Context, arg UpdatePasteParams) error {
-	_, err := q.db.ExecContext(ctx, updatePaste, arg.Text, arg.ID)
-	return err
+func (q *Queries) UpdatePaste(ctx context.Context, arg UpdatePasteParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, updatePaste, arg.Text, arg.ID)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }

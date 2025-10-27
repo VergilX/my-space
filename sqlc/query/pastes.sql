@@ -1,21 +1,29 @@
 -- name: CreatePaste :exec
-INSERT INTO pastes(userid, text) VALUES (
-    ?, ?
+INSERT INTO pastes(userid, text, expires) VALUES (
+    ?, ?, ?
 );
 
 -- name: GetAllPastes :many
 SELECT * FROM pastes
-    WHERE userid = ?;
+    WHERE
+        userid = ?
+        AND
+        expires > CURRENT_TIMESTAMP;
 
--- name: UpdatePaste :exec
+-- name: UpdatePaste :one
 UPDATE pastes
     SET text = ?
-WHERE id = ?;
+WHERE id = ?
+AND
+expires > CURRENT_TIMESTAMP
+RETURNING id;
 
--- name: DeletePaste :exec
+-- name: DeletePaste :one
 DELETE FROM pastes
-    WHERE id = ?;
+    WHERE id = ?
+    AND expires > CURRENT_TIMESTAMP
+RETURNING id;
 
--- name: DeleteAllClipsFromUser :exec
+-- name: DeleteAllPastesFromUser :exec
 DELETE FROM pastes
-    WHERE userid = ?;
+    WHERE userid = ? AND expires > CURRENT_TIMESTAMP;

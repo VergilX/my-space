@@ -25,5 +25,10 @@ func (app *application) routes() http.Handler {
 	router.Handle("GET /v1/clipboard", baseChain.ThenFunc(app.getClipContent))
 	router.Handle("POST /v1/setclip", baseChain.ThenFunc(app.setClipText))
 
+	router.Handle("GET /v1/viewallpaste", baseChain.ThenFunc(app.getAllPaste))
+	router.Handle("POST /v1/newpaste", baseChain.ThenFunc(app.addPaste))
+	router.Handle("POST /v1/editpaste", baseChain.ThenFunc(app.editPaste))
+	router.Handle("POST /v1/deletepaste", baseChain.ThenFunc(app.deletePaste))
+
 	return app.recoverPanic(app.requestLog(router))
 }

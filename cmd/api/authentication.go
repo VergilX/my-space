@@ -12,7 +12,8 @@ import (
 	"github.com/VergilX/my-space/internal/validator"
 )
 
-var SQLITE_FORMAT_STRING = "2006-01-02T15:04:05.000Z"
+// RFC 3339
+var SQLITE_FORMAT_STRING = "2006-01-02 15:04:05"
 var TOKEN_SIZE int = 128
 
 func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {

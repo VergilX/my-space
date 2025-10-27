@@ -23,7 +23,7 @@ This is a project which allows me to dump files in my local network. Being local
 | POST            | /v1/setclip        | setClipText   | Sets content of clipboard                 |
 | GET             | /v1/view_all_paste | getAllPaste   | Gets all pastes of user                   |
 | GET             | /v1/getpaste/:id   | getPaste      | Gets specified paste                      |
-| POST            | /v1/newpaste       | writeNewPaste | Writes new paste                          |
+| POST            | /v1/newpaste       | addNewPaste   | Writes new paste                          |
 | SFTP            | /v1/send           | sendFile      | Prepares to send file to listening server |
 | SFTP            | /v1/receive        | receiveFile   | Receives file from sftp port              |
 | HLS & MPEG-DASH | /v1/stream_client  | streamClient  | Send stream data                          |
@@ -65,6 +65,8 @@ doubts:
 - [ ] Timer to clean clips at the end of the day
 
 #### Paste
+- [x] Issue: check if paste can be edited even after deletion
+- [ ] Change timing to local time. Currently in UTC
 
 #### FTP
 
