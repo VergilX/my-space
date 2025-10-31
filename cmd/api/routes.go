@@ -30,5 +30,8 @@ func (app *application) routes() http.Handler {
 	router.Handle("POST /v1/editpaste", baseChain.ThenFunc(app.editPaste))
 	router.Handle("POST /v1/deletepaste", baseChain.ThenFunc(app.deletePaste))
 
+	router.Handle("POST /v1/send", baseChain.ThenFunc(app.uploadFile))
+	router.Handle("GET /v1/receive", baseChain.ThenFunc(app.downloadFile))
+
 	return app.recoverPanic(app.requestLog(router))
 }

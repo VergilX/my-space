@@ -69,5 +69,7 @@ doubts:
 - [ ] Change timing to local time. Currently in UTC
 
 #### FTP
+- [x] Use HTTP to implement file transfer (works with pdf rn)
+- [ ] Test with other files after implementing frontend
 
 #### Streaming

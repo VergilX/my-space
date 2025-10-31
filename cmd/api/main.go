@@ -4,10 +4,12 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"log/slog"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	database "github.com/VergilX/my-space/internal/db"
@@ -25,10 +27,20 @@ type config struct {
 
 // dependency injection components
 type application struct {
-	config  config
-	logger  *slog.Logger
-	querier *dblayer.Queries
-	ctx     context.Context
+	config    config
+	logger    *slog.Logger
+	querier   *dblayer.Queries
+	ctx       context.Context
+	transfers map[int]*Transfer
+	lock      sync.Mutex
+}
+
+type Transfer struct {
+	reader  io.ReadCloser
+	writer  http.ResponseWriter
+	ready   chan bool
+	done    chan bool
+	errChan chan error
 }
 
 func main() {
@@ -51,10 +63,12 @@ func main() {
 	defer db.CloseConn()
 
 	app := application{
-		config:  cfg,
-		logger:  logger,
-		querier: db.Queries,
-		ctx:     context.Background(),
+		config:    cfg,
+		logger:    logger,
+		querier:   db.Queries,
+		ctx:       context.Background(),
+		transfers: make(map[int]*Transfer),
+		lock:      sync.Mutex{},
 	}
 
 	srv := http.Server{
