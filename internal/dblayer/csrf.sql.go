@@ -36,15 +36,20 @@ func (q *Queries) DeleteCSRFToken(ctx context.Context, userid int64) error {
 }
 
 const getCSRFToken = `-- name: GetCSRFToken :one
-SELECT token FROM csrf
+SELECT id, userid, token, expiry FROM csrf
     WHERE userid = ?
 `
 
-func (q *Queries) GetCSRFToken(ctx context.Context, userid int64) (string, error) {
+func (q *Queries) GetCSRFToken(ctx context.Context, userid int64) (Csrf, error) {
 	row := q.db.QueryRowContext(ctx, getCSRFToken, userid)
-	var token string
-	err := row.Scan(&token)
-	return token, err
+	var i Csrf
+	err := row.Scan(
+		&i.ID,
+		&i.Userid,
+		&i.Token,
+		&i.Expiry,
+	)
+	return i, err
 }
 
 const renewCSRFToken = `-- name: RenewCSRFToken :exec

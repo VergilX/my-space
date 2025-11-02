@@ -36,15 +36,20 @@ func (q *Queries) DeleteSessionToken(ctx context.Context, userid int64) error {
 }
 
 const getSessionToken = `-- name: GetSessionToken :one
-SELECT token FROM session
+SELECT id, userid, token, expiry FROM session
     WHERE userid = ?
 `
 
-func (q *Queries) GetSessionToken(ctx context.Context, userid int64) (string, error) {
+func (q *Queries) GetSessionToken(ctx context.Context, userid int64) (Session, error) {
 	row := q.db.QueryRowContext(ctx, getSessionToken, userid)
-	var token string
-	err := row.Scan(&token)
-	return token, err
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.Userid,
+		&i.Token,
+		&i.Expiry,
+	)
+	return i, err
 }
 
 const getUserIDFromSessionToken = `-- name: GetUserIDFromSessionToken :one

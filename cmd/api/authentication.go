@@ -134,7 +134,32 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			// create new tokens (Session and CSRF) only if
+			// existing token is expired
 			expiry := time.Now().Add(24 * time.Hour)
+
+			existingSessionToken, err := app.querier.GetSessionToken(app.ctx, user.ID)
+			if err != nil {
+				app.serverError(w, r, err)
+				return
+			}
+			existingCSRFToken, err := app.querier.GetCSRFToken(app.ctx, user.ID)
+			if err != nil {
+				app.serverError(w, r, err)
+				return
+			}
+
+			existingSessionTokenExpiry, err := time.Parse(SQLITE_FORMAT_STRING, existingSessionToken.Expiry)
+			if err != nil {
+				app.serverError(w, r, err)
+				return
+			}
+			if expired := time.Now().After(existingSessionTokenExpiry); !expired {
+				// if not expired, retain same session token but with new expiry
+				// assuming CSRF and Session have same expiry
+				session_token = existingSessionToken.Token
+				csrf_token = existingCSRFToken.Token
+			}
 
 			// set in db
 			err = app.querier.RenewSessionToken(app.ctx, dblayer.RenewSessionTokenParams{

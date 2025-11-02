@@ -52,6 +52,7 @@ This is a project which allows me to dump files in my local network. Being local
 - [x] in protection middleware, keep UserId in context
 - [x] Integrate database with backend
 - [x] Modify userAuth middleware
+- [x] Logging in on different machine will not cause logout on others
 - [ ] Add indexing
 - [ ] Add bool to exists variable in authentication
 - [ ] Clean invalid sessions at the end of the day

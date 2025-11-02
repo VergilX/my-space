@@ -4,7 +4,7 @@ INSERT INTO csrf(userid, token) VALUES (
 );
 
 -- name: GetCSRFToken :one
-SELECT token FROM csrf
+SELECT * FROM csrf
     WHERE userid = ?;
 
 -- name: RenewCSRFToken :exec

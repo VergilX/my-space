@@ -4,7 +4,7 @@ INSERT INTO session(userid, token) VALUES (
 );
 
 -- name: GetSessionToken :one
-SELECT token FROM session
+SELECT * FROM session
     WHERE userid = ?;
 
 -- name: GetUserIDFromSessionToken :one
